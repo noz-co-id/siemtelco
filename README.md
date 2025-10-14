@@ -17,6 +17,10 @@ Analysis Log
 * SGSN Received AttachRequest Procedures - https://www.linkedin.com/pulse/sgsn-received-attachrequest-procedures-tri--pe9yc
 * GSM CCCH - Abused System Information Type 6 - https://www.linkedin.com/pulse/gsm-ccch-abused-system-information-type-6-tri--3kcuc
 * GSM CCCH — Abused Paging Request Type 1 - https://www.linkedin.com/pulse/gsm-ccch-abused-paging-request-type-1-tri--zvtrc/
+* GSM CCCH - Abused System Information Type 4 - https://www.linkedin.com/pulse/gsm-ccch-abused-system-information-type-4-tri-s-fmehc
+
+Halu
+* Deep Thought about Signaling - https://www.linkedin.com/pulse/deep-thought-signaling-tri--ahvgc/
  
 
   
