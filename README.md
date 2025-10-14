@@ -1,10 +1,13 @@
 # siemtelco
 This project leverages a combination of OpenBTS, Osmocom stack, and Ella-core to build a telco-aware SIEM pipeline
 
+<img width="2232" height="598" alt="lab arsitektur" src="https://github.com/user-attachments/assets/02a8fe30-6eac-4dcb-9fad-93acd74bf16b" />
+
+
 Benefit : 
 * endpoint and cell behavior analysis realtime for detection response
-*	low level kernel analysis behavior realtime
-*	fraud detection realtime.
+* low level kernel analysis behavior realtime
+* fraud detection realtime.
 
 Architecture
 * https://www.linkedin.com/pulse/membangun-siem-telco-berbasis-open-source-integrasi-openbts-tri--92snc
