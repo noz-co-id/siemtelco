@@ -18,6 +18,7 @@ Analysis Log
 * GSM CCCH - Abused System Information Type 6 - https://www.linkedin.com/pulse/gsm-ccch-abused-system-information-type-6-tri--3kcuc
 * GSM CCCH — Abused Paging Request Type 1 - https://www.linkedin.com/pulse/gsm-ccch-abused-paging-request-type-1-tri--zvtrc/
 * GSM CCCH - Abused System Information Type 4 - https://www.linkedin.com/pulse/gsm-ccch-abused-system-information-type-4-tri-s-fmehc
+* SGSN : Received Routing Area Update Request - https://www.linkedin.com/pulse/sgsn-received-routing-area-update-request-nozberkarya-ut9qc/
 
 Halu
 * Deep Thought about Signaling - https://www.linkedin.com/pulse/deep-thought-signaling-tri--ahvgc/
