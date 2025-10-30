@@ -1,6 +1,6 @@
 # 🛰️ SIEMTELCO – Telecom Security & Event Intelligence Platform
 
-**SIEMTELCO** is an open-source research initiative integrating **telecommunication network stacks** (OpenBTS, Osmocom, srsRAN) with a **Security Information and Event Management (SIEM)** system to enable *telco-aware* threat detection, anomaly monitoring, and fraud analytics.
+**SIEMTELCO** is an open-source research initiative integrating **telecommunication network stacks** (OpenBTS, Osmocom, Ella-core) with a **Security Information and Event Management (SIEM)** system to enable *telco-aware* threat detection, anomaly monitoring, and fraud analytics.
 
 ---
 
