@@ -1,0 +1,8 @@
+behavior_class: CELL_BEHAVIOR | SUBSCRIBER_BEHAVIOR | SIGNALING_BEHAVIOR
+indicator: string
+confidence: float
+time_window: seconds
+derived_from:
+  - protocol_event
+scope: cell | network | procedure
+privacy_level: aggregated
