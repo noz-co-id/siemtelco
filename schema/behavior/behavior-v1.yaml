@@ -1,8 +1,66 @@
-behavior_class: CELL_BEHAVIOR | SUBSCRIBER_BEHAVIOR | SIGNALING_BEHAVIOR
-indicator: string
-confidence: float
-time_window: seconds
-derived_from:
-  - protocol_event
-scope: cell | network | procedure
-privacy_level: aggregated
+version: 1.0
+description: >
+  Behavior schema for SIEMTelco testing environment.
+  Focused on aggregated, non-personal, network-level behavior.
+
+meta:
+  author: SIEMTelco Project
+  scope: testing
+  privacy_model: gdpr-by-design
+  data_level: aggregated
+
+behavior_event:
+  id: string            # unique event id
+  timestamp: float      # unix timestamp
+  time_window: integer  # seconds
+
+  behavior_class:
+    type: enum
+    values:
+      - CELL_BEHAVIOR
+      - SUBSCRIBER_BEHAVIOR
+      - SIGNALING_BEHAVIOR
+      - CORE_BEHAVIOR
+
+  indicator: string     # human-readable indicator name
+
+  scope:
+    type: enum
+    values:
+      - cell
+      - core
+      - procedure
+      - network
+
+  confidence:
+    type: float
+    range: [0.0, 1.0]
+
+  severity:
+    type: enum
+    values:
+      - low
+      - medium
+      - high
+
+  derived_from:
+    description: source protocol events
+    items:
+      - string           # e.g. GSM.ATTACH, NAS.REGISTRATION
+
+  context:
+    rat:
+      type: enum
+      values: [2G, 3G, 4G, 5G]
+    component:
+      type: enum
+      values: [UE, RAN, CORE]
+
+  privacy:
+    identifiers:
+      stored: false
+      method: aggregated-only
+
+  recommendation:
+    description: non-enforcing suggestion
+    type: string
