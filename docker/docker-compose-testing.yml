@@ -1,0 +1,58 @@
+version: "3.9"
+
+networks:
+  rf-net:
+    internal: true
+  ran-net:
+    internal: true
+  core-net:
+    internal: true
+
+services:
+
+  # UE
+  ue-gsm:
+    build: ./ue/osmocombb
+    privileged: true
+    devices:
+      - /dev/bus/usb
+    networks: [rf-net]
+
+  ue-lte:
+    build: ./ue/srsue
+    privileged: true
+    devices:
+      - /dev/bus/usb
+    networks: [rf-net]
+
+  # RAN
+  ran-gsm:
+    build: ./ran/openbts
+    privileged: true
+    devices:
+      - /dev/bus/usb
+    networks: [rf-net, ran-net]
+
+  ran-lte:
+    build: ./ran/srsran
+    privileged: true
+    devices:
+      - /dev/bus/usb
+    networks: [rf-net, ran-net]
+
+  # Core
+  core-2g:
+    build: ./core/osmocom
+    networks: [ran-net, core-net]
+
+  core-45g:
+    build: ./core/open5gs
+    networks: [ran-net, core-net]
+
+  # SIEM (PASSIVE)
+  siemtelco:
+    build: ./docker/siem
+    networks: [core-net]
+    volumes:
+      - ../output:/data
+    command: ["siemtelco", "--mode=observe"]
