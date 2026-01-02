@@ -1,0 +1,7 @@
+{
+  "behavior_class": "CELL_IDENTITY",
+  "indicator": "LAC_FLAPPING",
+  "confidence": 0.92,
+  "derived_from": ["GSM.ATTACH", "LOCATION.UPDATE"],
+  "policy_recommendation": "verify_cell_authenticity"
+}
