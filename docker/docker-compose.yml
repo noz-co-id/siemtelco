@@ -1,0 +1,33 @@
+##Simplified Core
+version: "3.8"
+
+services:
+  openbts:
+    image: noz/openbts-sim
+    container_name: openbts
+    networks: [ telco-net ]
+
+  osmo-msc:
+    image: noz/osmocom-core
+    container_name: osmo-msc
+    networks: [ telco-net ]
+
+  open5gs:
+    image: noz/open5gs-core
+    container_name: open5gs
+    networks: [ telco-net ]
+
+  ueransim:
+    image: noz/ueransim
+    container_name: ueransim
+    networks: [ telco-net ]
+
+  siemtelco:
+    image: noz/siemtelco
+    volumes:
+      - ./output:/data
+    networks: [ telco-net ]
+
+networks:
+  telco-net:
+    driver: bridge
