@@ -1,133 +1,164 @@
-# 🛰️ SIEMTELCO – Telecom Security & Event Intelligence Platform
+## Architecture Overview
 
-**SIEMTELCO** is an open-source research initiative integrating **telecommunication network stacks** (OpenBTS, Osmocom, Ella-core) with a **Security Information and Event Management (SIEM)** system to enable *telco-aware* threat detection, anomaly monitoring, and fraud analytics.
+SIEM Telco is built around the principle that **network behavior emerges from the interaction between radio conditions, protocol procedures, and core network logic**.
 
----
+To preserve this behavior, the architecture explicitly separates:
+- **Radio & RF emulation**
+- **Radio Access Network (RAN)**
+- **Core Network**
+- **Behavior analytics (SIEMTelco)**
 
-## 🔍 Overview
+All components operate inside a **controlled laboratory environment**.
 
-SIEMTELCO bridges the gap between **telecommunication telemetry** and **cybersecurity analytics**.
+### High-Level Architecture (Visual)
 
-It enables real-time observation and correlation of **endpoint**, **cell**, and **kernel-level** behaviours in mobile networks, supporting use cases such as:
+```mermaid
+flowchart LR
+    UE[UE Emulators<br/>OsmocomBB / srsUE]
+    USRP[USRP B2901<br/>RF Emulation]
+    RAN[RAN Stack<br/>OpenBTS / srsRAN]
+    CORE[Core Network<br/>Osmocom / Open5GS]
+    LOGS[Protocol & RF Telemetry]
+    SIEM[SIEMTelco<br/>Behavior Pipeline]
+    BEHAVIOR[Behavior Models<br/>& Analytics]
 
-- 📡 Signalling anomaly detection (Attach, PDP Context, CCCH abuse)
-- ⚡ Real-time endpoint–cell behaviour correlation
-- 🧩 Kernel-level process monitoring and anomaly detection
-- 🔐 Telecom fraud, rogue base-station, and IMSI-catcher analysis
+    UE --> USRP
+    USRP --> RAN
+    RAN --> CORE
+    RAN --> LOGS
+    CORE --> LOGS
+    LOGS --> SIEM
+    SIEM --> BEHAVIOR
+```
 
-Designed for research, private network operators, and telecom engineers exploring **converged telecom-security architectures**.
 
----
+### Architectural Intent
+- **UE emulators** generate controlled and repeatable device behavior
+- **USRP** preserves real RF characteristics without using public spectrum
+- **RAN and Core** follow 3GPP-compliant procedures
+- **SIEM Telco** observes and models behavior, not raw packets
 
-## 🧩 Architecture
+No component performs interception, manipulation, or modification of live traffic.
 
-<img width="2232" height="598" alt="lab arsitektur siem" src="https://github.com/user-attachments/assets/df7c19d7-badc-4c35-a886-77eb62dc651d" />
 
-SIEMTELCO integrates multiple open-source components into a modular framework:
 
-| Layer | Component | Description |
-|:------|:-----------|:-------------|
-| **Radio Access / Core** | OpenBTS, Osmocom, srsRAN | Provides GSM/4G/5G signalling and network context |
-| **Telemetry & Message Bus** | Fluentd / Kafka | Handles event ingestion and distribution |
-| **SIEM Core** | Ella-core / Elasticsearch | Event correlation, anomaly detection, and analytics |
-| **SOC & Visualization** | Grafana / Kibana | Dashboards for network and security event monitoring |
+### Containerized Telco Core Simulation (2G–5G)
+SIEM Telco provides a **containerized telco-core environment** that mirrors real-world mobile network architecture while remaining **safe, isolated, and research-oriented.**
 
-### Alignment with ISO/IEC 27001:2022 Controls
+### Key Principle
+> RF behavior is real. Core and analytics are containerized.
+Containers are used for **RAN, Core Network, and SIEM,** while **RF is handled by external SDR hardware.**
 
-| Control Area | Description |
-|:--------------|:-------------|
-| A.12.4 | Continuous monitoring and log analysis |
-| A.16 | Security incident management |
-| A.9 / A.12 | Access control and operational security |
-| A.8 / A.10 | Data integrity and protection mechanisms |
 
----
+### Radio Access & RF Emulation (MANDATORY)
+### Why RF Emulation Is Mandatory
+Mobile network behavior cannot be accurately studied using IP-only simulations.
+Radio conditions directly affect:
+- attach and detach procedures
+- timing advance
+- cell reselection
+- handover behavior
+- signaling stability
+  
+For this reason, **all transceivers and endpoints in SIEMTelco operate through RF emulation.**
 
-## ⚙️ Key Features
+### RF Stack
+- SDR Hardware: USRP B2901 (reference platform)
+- Driver: UHD (USRP Hardware Driver)
+- Environment: Shielded / attenuated lab setup
 
-- 🛰️ **Telco-aware SIEM pipeline** – native parsing of signalling and RAN logs  
-- ⚡ **Real-time correlation engine** – links events between UE, BTS, and kernel domains  
-- 🧠 **Behavioural anomaly analysis** – machine-assisted pattern recognition (in progress)  
-- 🔐 **Regulatory alignment** – ISO 27001, NIST SP 800-53, GDPR, and CCPA readiness  
-- 🧾 **Fraud & intrusion detection** – detects rogue cells, fake BTS, and DoS patterns  
+No over-the-air transmission to public networks is permitted.
 
----
+### Endpoint (UE) Emulation
+Real user devices are intentionally **not used.**
+Supported UE emulators:
+**OsmocomBB**
+- 2G GSM UE behavior
+- L1/L2/L3 visibility
+**srsUE**
+- 4G LTE / 5G NR UE behavior
+- NAS and RRC procedure testing
 
-## 🧠 Research Areas
+**These endpoints:**
+- generate deterministic behavior
+- avoid personal data exposure
+- support repeatable experiments
 
-- Telecom cybersecurity & signalling analysis  
-- Edge computing for event processing  
-- Network intelligence and smart telemetry  
-- Incident response automation in telecom SOC environments  
+### Network Stack Coverage
+| Layer     | Technology            | RF Mode   |
+| --------- | --------------------- | --------- |
+| UE        | OsmocomBB, srsUE      | RF (USRP) |
+| RAN       | OpenBTS, srsRAN       | RF (USRP) |
+| Core      | Osmocom Core, Open5GS | Container |
+| Analytics | SIEMTelco             | Container |
 
----
+### Repository Structure
+```lua
+siemtelco/
+├── docker/
+│   ├── docker-compose.yml
+│   ├── ran/
+│   │   ├── openbts/
+│   │   └── srsran/
+│   ├── core/
+│   │   ├── osmocom/
+│   │   └── open5gs/
+│   ├── ue/
+│   │   ├── osmocombb/
+│   │   └── srsue/
+│   └── rf/
+│       └── usrp/
+├── generators/
+├── output/
+│   ├── raw_logs/
+│   └── behavior_events/
+```
 
-## 📘 Documentation
+### USRP Binding to Docker Containers
+To allow RAN containers to access SDR hardware, USRP devices are explicitly bound to Docker.
+**Binding Concept**
+- UHD runs on the host system
+- RAN containers access USRP via USB or network binding
+- Containers run in privileged mode for SDR access
 
-| Resource | Description |
-|:----------|:-------------|
-| [`Silence On The Wire PDF`](./Silence%20On%20The%20Wire%20PDF.pdf) | Whitepaper – passive signalling analysis |
-| [`whitepaper_imsicatchers_eff_0.pdf`](./whitepaper_imsicatchers_eff_0.pdf) | Whitepaper – IMSI catcher threat evaluation |
-| `/docs/` | Architecture notes, lab topology, and deployment guidance |
+### Example (docker-compose snippet)
+```yaml
+services:
+  ran-gsm:
+    image: noz/openbts
+    privileged: true
+    devices:
+      - /dev/bus/usb
+    volumes:
+      - ./rf/usrp:/usrp
 
----
+  ran-lte:
+    image: noz/srsran
+    privileged: true
+    devices:
+      - /dev/bus/usb
+```
 
-## 🧩 Licensing & Contribution
+### This approach ensures:
+- realistic RF-driven behavior
+- isolation from public networks
+- reproducible laboratory experiments
 
-This project is released under **CC0-1.0 (Public Domain)**.
 
-Contributions are welcome — especially from researchers and engineers focusing on:
+## Safety and Usage Notice
+### ⚠️ LAB ENVIRONMENT ONLY
+- Use RF shielding and attenuators
+- Do not transmit on public spectrum
+- Do not connect to live operator networks
+- Do not use real subscriber identities
 
-- Telecom network security  
-- 5G/IoT signalling analytics  
-- SIEM integration and edge intelligence  
+The author and contributors **strongly discourage testing in real networks.**
 
-To contribute:
-1. Fork the repository  
-2. Create your feature branch (`git checkout -b feature/awesome-feature`)  
-3. Commit changes (`git commit -m 'Add feature'`)  
-4. Push to branch (`git push origin feature/awesome-feature`)  
-5. Create a Pull Request 🚀
 
----
 
-## 🌍 Project Vision
-
-> “To build an open, unified platform that connects telecom signalling intelligence  
-> with modern cybersecurity analytics — enabling smarter, real-time protection for next-generation networks.”
-
----
-
-## 📫 Contact & Collaboration
-
-For research or collaboration inquiries:  
-**Linkedin:** [Tri](https://linkedin.com/in/noz)  
-**GitHub:** [noz-co-id/siemtelco](https://github.com/noz-co-id/siemtelco)
-
----
-
-### example log analysis
-
-* Activate PDP Context Accept Procedures - https://www.linkedin.com/pulse/mapping-metadata-related-3gpp-procedures-tri--3yluc
-* SGSN Received AttachRequest Procedures - https://www.linkedin.com/pulse/sgsn-received-attachrequest-procedures-tri--pe9yc
-* GSM CCCH - Abused System Information Type 6 - https://www.linkedin.com/pulse/gsm-ccch-abused-system-information-type-6-tri--3kcuc
-* GSM CCCH — Abused Paging Request Type 1 - https://www.linkedin.com/pulse/gsm-ccch-abused-paging-request-type-1-tri--zvtrc/
-* GSM CCCH - Abused System Information Type 4 - https://www.linkedin.com/pulse/gsm-ccch-abused-system-information-type-4-tri-s-fmehc
-* SGSN : Received Routing Area Update Request - https://www.linkedin.com/pulse/sgsn-received-routing-area-update-request-nozberkarya-ut9qc/
-* Potentially dangerous mode on OpenBTS: 0755 - https://www.linkedin.com/pulse/potentially-dangerous-mode-openbts-0755-tri-s-rb2xc/
-
-Halu
-* Deep Thought about Signaling - https://www.linkedin.com/pulse/deep-thought-signaling-tri--ahvgc/
-
----
-
-### 🧱 Status
-
-> ⚙️ **Current Phase:** Research & Prototype  
-> 🧪 **Next Step:** Integration with live Open5GS + Grafana SIEM visualization  
-> 📦 **Releases:** Coming soon
-
----
-
-_© 2025 – SIEMTELCO Project (CC0-1.0)._
-
+### Summary
+This architecture ensures that:
+- Behavior is driven by real RF conditions
+- Analysis remains protocol-aligned and compliant
+- Privacy and legal boundaries are respected
+- Research results are reproducible and defensible
