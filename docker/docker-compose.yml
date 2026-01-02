@@ -1,33 +1,105 @@
-##Simplified Core
-version: "3.8"
+version: "3.9"
 
+############################
+# NETWORK DEFINITIONS
+############################
+networks:
+  rf-net:
+    internal: true
+  ran-net:
+    internal: true
+  core-net:
+    internal: true
+  siem-net:
+    internal: true
+
+############################
+# SERVICES
+############################
 services:
-  openbts:
-    image: noz/openbts-sim
-    container_name: openbts
-    networks: [ telco-net ]
 
-  osmo-msc:
-    image: noz/osmocom-core
-    container_name: osmo-msc
-    networks: [ telco-net ]
+  ############################
+  # UE EMULATORS (RF ONLY)
+  ############################
+  ue-gsm:
+    build: ./docker/ue/osmocombb
+    container_name: ue-gsm
+    privileged: true
+    devices:
+      - /dev/bus/usb
+    networks:
+      - rf-net
+    restart: unless-stopped
 
-  open5gs:
-    image: noz/open5gs-core
-    container_name: open5gs
-    networks: [ telco-net ]
+  ue-lte:
+    build: ./docker/ue/srsue
+    container_name: ue-lte
+    privileged: true
+    devices:
+      - /dev/bus/usb
+    networks:
+      - rf-net
+    restart: unless-stopped
 
-  ueransim:
-    image: noz/ueransim
-    container_name: ueransim
-    networks: [ telco-net ]
+  ############################
+  # RADIO ACCESS NETWORK
+  ############################
+  ran-gsm:
+    build: ./docker/ran/openbts
+    container_name: ran-gsm
+    privileged: true
+    devices:
+      - /dev/bus/usb
+    networks:
+      - rf-net
+      - ran-net
+    restart: unless-stopped
 
+  ran-lte:
+    build: ./docker/ran/srsran
+    container_name: ran-lte
+    privileged: true
+    devices:
+      - /dev/bus/usb
+    networks:
+      - rf-net
+      - ran-net
+    restart: unless-stopped
+
+  ############################
+  # CORE NETWORK
+  ############################
+  core-2g:
+    build: ./docker/core/osmocom
+    container_name: core-2g
+    networks:
+      - ran-net
+      - core-net
+    restart: unless-stopped
+
+  core-45g:
+    build: ./docker/core/open5gs
+    container_name: core-45g
+    networks:
+      - ran-net
+      - core-net
+    restart: unless-stopped
+
+  ############################
+  # SIEM & BEHAVIOR PIPELINE
+  ############################
   siemtelco:
-    image: noz/siemtelco
+    build: ./docker/siem
+    container_name: siemtelco
+    networks:
+      - core-net
+      - siem-net
     volumes:
       - ./output:/data
-    networks: [ telco-net ]
+    restart: unless-stopped
 
-networks:
-  telco-net:
-    driver: bridge
+############################
+# GLOBAL POLICIES
+############################
+x-offline-policy: &offline
+  network_mode: none
