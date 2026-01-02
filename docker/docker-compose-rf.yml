@@ -1,0 +1,22 @@
+services:
+  ran-gsm:
+    image: noz/openbts
+    privileged: true
+    devices:
+      - /dev/bus/usb
+    volumes:
+      - ./rf/usrp:/usrp
+
+  ran-lte:
+    image: noz/srsran
+    privileged: true
+    devices:
+      - /dev/bus/usb
+
+  core:
+    image: noz/open5gs
+
+  siemtelco:
+    image: noz/siemtelco
+    volumes:
+      - ./output:/data
